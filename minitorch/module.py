@@ -31,13 +31,17 @@ class Module:
 
     def train(self) -> None:
         """Set the mode of this module and all descendent modules to `train`."""
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        self.training = True
+        if self._modules != 0:
+            for k in self._modules:
+                self._modules[k].train()
 
     def eval(self) -> None:
         """Set the mode of this module and all descendent modules to `eval`."""
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        self.training = False
+        if self._modules != 0:
+            for k in self._modules:
+                self._modules[k].eval()
 
     def named_parameters(self) -> Sequence[Tuple[str, Parameter]]:
         """Collect all the parameters of this module and its descendents.
@@ -47,13 +51,25 @@ class Module:
             The name and `Parameter` of each ancestor parameter.
 
         """
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        if len(self._modules) == 0:
+            res_seq = []
+            for p_name in self._parameters:
+                res_seq.append((p_name, self._parameters[p_name]))
+            return res_seq
+        else:
+            cur_seq = []
+            for p_name in self._parameters:
+                cur_seq.append((p_name, self._parameters[p_name]))
+            for m_name in self._modules:
+                child_seq = self._modules[m_name].named_parameters()
+                for tup in child_seq:
+                    cur_seq.append((m_name + '.' + tup[0], tup[1]))
+            return cur_seq
+                        
 
     def parameters(self) -> Sequence[Parameter]:
         """Enumerate over all the parameters of this module and its descendents."""
-        # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        return [tup[1] for tup in self.named_parameters()]
 
     def add_parameter(self, k: str, v: Any) -> Parameter:
         """Manually add a parameter. Useful helper for scalar parameters.
